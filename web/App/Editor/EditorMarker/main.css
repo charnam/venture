@@ -4,7 +4,7 @@
 	position: relative;
 }
 
-.editor-marker-deselected-msg {
+.editor-marker-deselected {
 	position: absolute;
 	inset: 0;
 	display: flex;
@@ -21,17 +21,17 @@
 	cursor: pointer;
 	pointer-events: none;
 }
-.editor-marker-deselected-msg i {
+.editor-marker-deselected i {
 	font-size: 3em;
 }
 
-.editor-marker-deselected .editor-marker-deselected-msg {
+.editor-marker-show-deselected .editor-marker-deselected {
 	transform: translateY(0px);
 	opacity: 1;
 	pointer-events: unset;
 }
 
-.editor-marker-showcount-text {
+.editor-marker-showcount {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -41,6 +41,28 @@
 	transition: opacity 0.2s ease-in-out;
 	pointer-events: none;
 }
-.editor-marker-showcount .editor-marker-showcount-text {
+.editor-marker-show-showcount .editor-marker-showcount {
 	opacity: 1;
+}
+
+
+.editor-marker-editactions-selectaction {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	gap: 5px;
+	padding: 5px;
+	box-sizing: border-box;
+}
+.editor-marker-editactions-selectaction-action {
+	color: var(--editor-color-border);
+	background: var(--editor-color-background-active);
+	display: flex;
+	flex-direction: column;
+	border-radius: 10px;
+}
+.editor-marker-editactions-selectaction-action[disabled] {
+	opacity: 0.5;
+}
+.editor-marker-editactions-selectaction-action i {
+	font-size: 2em;
 }

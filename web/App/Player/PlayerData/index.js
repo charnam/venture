@@ -2,12 +2,110 @@ import * as zip from "@zip.js/zip.js";
 import { HTML } from "imperative-html";
 
 class PlayerData {
+	static actions = [
+		{
+			type: "element_create",
+			
+			name: "Create element",
+			icon: "bi bi-plus-square-dotted",
+			
+			attributes: {
+				id: {type: "new_element_id"},
+				data: {type: "element_data"}
+			},
+			
+			canBeAdded: (file, video, marker) => {
+				if(file.getPossibleElementsAt(marker.video, marker.timestamp).length > 7) {
+					return false;
+				}
+				
+				return true;
+			},
+			canBeNested: false
+		},
+		{
+			type: "element_remove",
+			
+			name: "Remove element",
+			icon: "bi bi-dash-square-dotted",
+			
+			attributes: {
+				id: {type: "existing_element_id"}
+			},
+			
+			canBeAdded: (file, video, marker) => {
+				if(file.getPossibleElementsAt(video, marker.timestamp).length > 0) {
+					return true;
+				}
+				
+				return false;
+			},
+			canBeNested: false
+		},
+		{
+			type: "element_animate",
+			
+			name: "Animate element",
+			icon: "bi bi-bezier2",
+			
+			attributes: {
+				id: {type: "existing_element_id"}
+			},
+			
+			canBeAdded: (file, video, marker) => {
+				if(file.getPossibleElementsAt(video, marker.timestamp).length > 0) {
+					return true;
+				}
+				
+				return false;
+			},
+			canBeNested: false
+		},
+		{
+			type: "skip",
+			
+			name: "Skip to...",
+			icon: "bi bi-fast-forward-fill",
+			
+			attributes: {
+				video: {type: "video"},
+				time: {type: "float", min: 0, max: 60*60*60}
+			}
+		},
+		{
+			type: "pause_until",
+			
+			name: "Pause",
+			icon: "bi bi-pause-fill",
+			
+			attributes: {
+				until: {type: "user_event"}
+			}
+		},
+	];
+	static actionValidation = {
+		type: "array",
+		items: {
+			type: "any",
+			of: this.actions
+		}
+	};
 	
 	version = 1;
 	
 	id = "local";
 	title = "My Venture";
 	videos = [];
+	
+	getPossibleElementsAt(video, timestamp) {
+		let elements = [];
+		if(this.videos[video]) {
+			for(let marker of Object.values(this.videos[video].markers).sort((a, b) => a.timestamp - b.timestamp)) {
+				
+			}
+		}
+		return elements;
+	}
 	
 	constructor(json = {}) {
 		try {
@@ -29,7 +127,7 @@ class PlayerData {
 					timestamp: marker?.timestamp ?? 0,
 					actions: marker?.actions?.map(action => ({
 						type: action?.type,
-						attributes: structuredClone(action?.attributes) ?? []
+						attributes: structuredClone(action?.attributes) ?? {}
 					})) ?? []
 				}]) ?? []
 			)
@@ -48,7 +146,7 @@ class PlayerData {
 		}
 		
 		// Project data version update code would go here,
-		// but we're already on version 1, so we don't really
+		// but we're only on version 1, so we don't really
 		// need anything
 		switch(this.version) {
 		}

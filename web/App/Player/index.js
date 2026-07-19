@@ -12,7 +12,11 @@ class Player extends SingleInstanceRenderable {
 	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "player"];
 	
+	// data: video data, markers, etc
+	// state: logic / variable storage during playback, not saved (a save feature may be added later)
 	data = new PlayerData();
+	state = {};
+	
 	errorText = "Loading video...";
 	
 	playback = new HTML.video();
@@ -160,11 +164,6 @@ class Player extends SingleInstanceRenderable {
 		}
 		this.update();
 	}
-	
-	shouldShowError() {
-		
-	}
-	
 	
 	lastFrameVideoTime = 0; // video.currentTime ; set after animate()
 	animate(target) {
