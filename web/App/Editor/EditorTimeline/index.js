@@ -57,6 +57,12 @@ class EditorTimeline extends SingleInstanceRenderable {
 				this.editor.clearSelection();
 			}
 			
+			// These lines reduce bugs in edge-cases where the visual selection box still exists after the user
+			// has already released the mouse
+			for(let selection of target.querySelectorAll(".editor-timeline-scroller-selection-box")) {
+				selection.remove();
+			}
+			
 			const timelinePosA = this.mouseEventToTimelinePos(target, event);
 			
 			let selectionBox = null;
