@@ -1,0 +1,24 @@
+
+.player {
+	position: relative;
+}
+
+.app > .player {
+	position: absolute;
+	inset: 0;
+}
+
+.player > canvas {
+	inset: 0;
+	position: absolute;
+	object-fit: contain;
+	width: 100%;
+	height: 100%;
+}
+
+.player .player-overlay {
+	inset: 0;
+	position: absolute;
+	z-index: 100;
+	background: #0008;
+}

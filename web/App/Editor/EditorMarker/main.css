@@ -1,0 +1,46 @@
+.editor-marker {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+.editor-marker-deselected-msg {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	color: var(--editor-color-border);
+	text-align: center;
+	flex-direction: column;
+	justify-content: center;
+	gap: 16px;
+	opacity: 0;
+	transition: 0.2s ease-in-out;
+	transition-property: opacity, transform;
+	transform: translateY(20px);
+	white-space: pre-wrap;
+	cursor: pointer;
+	pointer-events: none;
+}
+.editor-marker-deselected-msg i {
+	font-size: 3em;
+}
+
+.editor-marker-deselected .editor-marker-deselected-msg {
+	transform: translateY(0px);
+	opacity: 1;
+	pointer-events: unset;
+}
+
+.editor-marker-showcount-text {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	transition: opacity 0.2s ease-in-out;
+	pointer-events: none;
+}
+.editor-marker-showcount .editor-marker-showcount-text {
+	opacity: 1;
+}

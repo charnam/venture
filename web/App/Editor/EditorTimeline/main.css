@@ -1,0 +1,107 @@
+.editor-timeline {
+	position: relative;
+	display: grid;
+	grid-template-areas: "timeline-sidebar timeline-scroller";
+	grid-template-columns: 48px 1fr;
+}
+
+.editor-timeline-sidebar {
+	grid-area: timeline-sidebar;
+	display: flex;
+	flex-direction: column;
+}
+.editor-timeline-sidebar-button {
+	aspect-ratio: 1 / 1;
+	font-size: 1.5em;
+	background: transparent;
+	border: none;
+	color: inherit;
+	cursor: pointer;
+}
+
+.editor-timeline-scroller {
+	grid-area: timeline-scroller;
+	overflow-x: auto;
+	display: flex;
+	flex-direction: column;
+	position: relative;
+}
+
+.editor-timeline-scroller-background {
+	background: var(--editor-color-background-active);
+	width: calc(var(--playback-duration) * var(--px-per-second));
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.editor-timeline-scroller-playbar {
+	position: sticky;
+	top: 0;
+	height: 32px;
+	background: var(--editor-color-background-inactive);
+	width: calc(var(--playback-duration) * var(--px-per-second));
+	z-index: 100;
+	cursor: pointer;
+}
+.editor-timeline-scroller-background-line {
+	width: 1px;
+	height: 100%;
+	background: var(--editor-color-background-inactive);
+}
+.editor-timeline-scroller-playbar-digit,
+.editor-timeline-scroller-background-line {
+	position: absolute;
+	left: calc(var(--x-sec) * var(--px-per-second));
+}
+.editor-timeline-scroller-playbar-digit {
+	color: var(--editor-color-border);
+}
+
+.editor-timeline-scroller-playhead,
+.editor-timeline-scroller-playbar-playhead {
+	position: absolute;
+	top: 0;
+	left: calc(var(--playback-time) * var(--px-per-second));
+	height: 100%;
+}
+.editor-timeline-scroller-playhead {
+	width: 1px;
+	background: white;
+	color: var(--editor-color-border);
+	transform: translateX(-100%);
+}
+.editor-timeline-scroller-playbar-playhead {
+	box-sizing: border-box;
+	transform: translateX(-50%);
+	font-size: 0.8em;
+	display: flex;
+	align-items: flex-end;
+	text-shadow: 0 1px 0px black;
+}
+.editor-timeline-scroller-marker {
+	position: absolute;
+	left: calc(var(--x-sec) * var(--px-per-second));
+	border: 3px solid hsl(var(--accent-hue), 50%, 50%);
+	width: 16px;
+	aspect-ratio: 1 / 1;
+	transform: translate(-50%, 50%) rotate(45deg);
+	box-sizing: border-box;
+	background: hsl(var(--accent-hue), 90%, 70%);
+	cursor: pointer;
+	transition: 0.2s ease-in-out;
+	transition-property: filter, outline;
+}
+.editor-timeline-scroller-marker.editor-selected {
+	cursor: grab;
+	filter: brightness(1.5);
+	outline: 1px solid white;
+	outline-offset: 2px;
+}
+.editor-timeline-scroller-selection-box {
+	background: #fff2;
+	height: 100%;
+	position: absolute;
+	left: calc(var(--start-sec) * var(--px-per-second));
+	width: calc((var(--end-sec) - var(--start-sec)) * var(--px-per-second));
+}

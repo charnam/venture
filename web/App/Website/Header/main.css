@@ -1,0 +1,106 @@
+.website-header {
+	display: grid;
+	grid-template-areas:
+		"home links search user";
+	grid-template-columns: fit-content(0) fit-content(0) 1fr fit-content(0);
+	gap: 16px;
+	padding: 0 20px;
+	height: 48px;
+	align-items: center;
+	background: hsl(var(--accent-hue) 20% 50%);
+	box-sizing: border-box;
+	box-shadow:
+		0px -20px 20px 10px hsl(var(--accent-hue) 20% 50%),
+		0px -40px 0px 20px hsl(var(--accent-hue) 20% 0%);
+}
+
+.website-header-links {
+	display: flex;
+	gap: 10px;
+	border-left: 1px solid #0008;
+	padding-left: 16px;
+}
+
+.website-header a {
+	color: #fff;
+	opacity: 0.5;
+	text-decoration: none;
+	font-weight: 600;
+	transition: 0.1s ease-out;
+	transition-property: transform, text-shadow, opacity, font-weight;
+}
+.website-header a:hover {
+	color: #fff;
+	opacity: 1;
+	text-shadow: 1px 1px 0px #000;
+	font-weight: 900;
+}
+
+a.website-header-home {
+	opacity: 1;
+	font-size: 1.2em;
+	font-weight: 900;
+	color: white;
+	transition: 0.1s ease-in-out;
+	transition-property: transform, text-shadow, opacity;
+}
+a.website-header-home:hover {
+	text-decoration: none;
+	transform: scale(1.1) translate(-1px, -1px);
+	text-shadow: 2px 2px 0px #000;
+}
+a.website-header-home:active {
+	transform: scale(0.9) translate(1px, 1px);
+	text-shadow: -2px -2px 0px #000;
+	opacity: 0.5;
+}
+
+
+.website-header-search {
+	border-radius: 128px;
+	background: white;
+	width: max(200px, min(20vw, 300px));
+	display: flex;
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+	justify-content: flex-end;
+	align-items: center;
+	height: 32px;
+}
+.website-header-search-input {
+	padding: 0px 20px;
+	font-size: 0.8em;
+	border-radius: inherit;
+	position: absolute;
+	inset: 0;
+	background: transparent;
+	border: none;
+	appearance: none;
+	display: flex;
+	align-items: center;
+	font-family: inherit;
+}
+.website-header-search:has(.website-header-search-input:focus) i,
+.website-header-search:has(.website-header-search-input:valid:hover) i {
+	display: none;
+}
+.website-header-search i {
+	background: linear-gradient(to right, transparent, white 10%, white);
+	border-radius: inherit;
+	display: block;
+	height: 100%;
+	width: 3.5em;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 10;
+	margin-right: 5px;
+	color: #0005;
+	font-size: 0.7em;
+	pointer-events: none;
+}
+.website-header-search-input::placeholder {
+	color: #0005;
+}
+

@@ -1,0 +1,137 @@
+@keyframes editor-appear {
+	0% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+	}
+}
+
+.editor {
+	--editor-color-border: hsl(var(--accent-hue) 10% 30%);
+	--editor-color-background-active: hsl(var(--accent-hue) 10% 20%);
+	--editor-color-background-inactive: hsl(var(--accent-hue) 10% 10%);
+	
+	display: grid;
+	color: white;
+	grid-template-areas:
+		"editor-menubar   editor-menubar "
+		"editor-marker    editor-player  "
+		"editor-timeline  editor-timeline";
+	grid-template-rows: 48px 2fr 1fr;
+	grid-template-columns: 1fr 2fr;
+	position: fixed;
+	inset: 0;
+	gap: 1px;
+	background: var(--editor-color-border);
+	transition: opacity 0.5s ease-in-out;
+}
+.editor > * {
+	background: var(--editor-color-background-inactive);
+}
+.editor > .editor-player {
+	display: flex;
+}
+.editor > .editor-player > .player {
+	width: 100%;
+	height: 100%;
+}
+@starting-style {
+	.editor {
+		opacity: 0;
+	}
+}
+.editor:after {
+	content: "";
+	position: fixed;
+	inset: 0;
+	background: black;
+	opacity: 0;
+	animation: editor-appear 1s ease-in-out;
+	pointer-events: none;
+	z-index: 9999;
+}
+
+.editor.is-removing {
+	opacity: 0;
+}
+
+.editor-menubar {
+	grid-area: editor-menubar;
+	background: var(--editor-color-background-active);
+}
+.editor-player {
+	grid-area: editor-player;
+}
+.editor-marker {
+	grid-area: editor-marker;
+}
+.editor-timeline {
+	grid-area: editor-timeline;
+}
+
+.editor-player-sidebar {
+	display: flex;
+	flex-direction: column;
+	width: 48px;
+	flex: none;
+}
+.editor-player-sidebar-button {
+	aspect-ratio: 1 / 1;
+	color: white;
+	font-size: 1.5em;
+	cursor: pointer;
+}
+
+.editor-choose-video-buttons {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	background: #0008;
+	grid-area: editor-marker / editor-marker / editor-timeline / editor-timeline;
+	z-index: 100;
+	transition: 0.8s ease-in;
+	transition-property: transform, opacity;
+	transition-timing-function: ease-in, linear;
+}
+.editor-hide-choose-video-buttons .editor-choose-video-buttons {
+	opacity: 0;
+	transform: translateY(256px);
+	pointer-events: none;
+}
+.editor-choose-video-buttons > button {
+	background: transparent;
+	color: inherit;
+	font-size: 1em;
+	font-weight: 300;
+	appearance: none;
+	border: none;
+	padding: 2em;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.editor-upload-video-button:first-child:last-child {
+	width: 100vw;
+}
+
+.editor-example-video-button {
+	border-left: 1px solid #fff3 !important;
+}
+
+.editor-choose-video-buttons i {
+	font-size: 3em;
+}
+
+.editor-video-button-text {
+	margin-top: 1em;
+	font-size: 0.8em;
+	opacity: 0.8;
+}
+
+.editor-choose-video-buttons > button {
+	font-size: 2em;
+	font-weight: 400;
+}

@@ -1,0 +1,36 @@
+@import url("../../node_modules/@fontsource-variable/manrope/wght.css");
+@import url("../../node_modules/bootstrap-icons/font/bootstrap-icons.min.css");
+
+:root {
+	--accent-hue: 260deg;
+}
+
+body {
+	font-family: "Manrope Variable", Helvetica, Arial, sans-serif;
+	font-size: 18px;
+	background: hsl(var(--accent-hue), 20%, 100%);
+	user-select: none;
+}
+
+.app {
+	display: contents;
+}
+
+.app > * {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100vw;
+}
+
+.preserve-aspect {
+	width: min(100vw, calc(100vw * 16 / 9));
+	height: min(100vh, calc(100vh * 9 / 16));
+}
+
+button, input {
+	background: transparent;
+	border: none;
+	font-size: inherit;
+	font-family: inherit;
+}

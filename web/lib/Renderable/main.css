@@ -1,0 +1,9 @@
+
+.is-debug-target {
+	outline: 1px solid gray;
+	outline-offset: -3px;
+}
+
+.is-loading-style {
+	display: none !important;
+}

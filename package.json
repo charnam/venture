@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@fontsource-variable/manrope": "^5.2.8",
+    "@zip.js/zip.js": "^2.8.31",
+    "bootstrap-icons": "^1.13.1",
+    "express": "^5.2.1",
+    "imperative-html": "^0.1.2"
+  }
+}
