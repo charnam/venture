@@ -1,4 +1,5 @@
 @import url("../../node_modules/@fontsource-variable/manrope/wght.css");
+@import url("../../node_modules/@fontsource/courier-prime/latin.css");
 @import url("../../node_modules/bootstrap-icons/font/bootstrap-icons.min.css");
 
 :root {
@@ -33,4 +34,7 @@ button, input {
 	border: none;
 	font-size: inherit;
 	font-family: inherit;
+	color: inherit;
+	margin: 0;
+	padding: 0;
 }

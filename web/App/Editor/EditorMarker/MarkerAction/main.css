@@ -1,0 +1,9 @@
+.editor-marker .marker-action {
+	padding: 8px 16px;
+	margin: 8px;
+	background: var(--editor-color-background-active);
+	border-radius: 8px;
+}
+.marker-action-inputline {
+	white-space: pre;
+}

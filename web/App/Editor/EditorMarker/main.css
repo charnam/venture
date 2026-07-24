@@ -2,6 +2,7 @@
 	display: flex;
 	flex-direction: column;
 	position: relative;
+	overflow: hidden;
 }
 
 .editor-marker-deselected {
@@ -45,6 +46,32 @@
 	opacity: 1;
 }
 
+.editor-marker-editactions {
+	position: absolute;
+	inset: 0;
+	
+	display: grid;
+	grid-template-rows: 96px 1fr;
+	grid-template-areas:
+		"editor-marker-editactions-title"
+		"editor-marker-editactions-body";
+	opacity: 0;
+	transition: 0.4s ease-in-out;
+	transition-property: opacity, transform;
+	transform: translateY(-50px);
+	pointer-events: none;
+}
+.editor-marker-show-editactions .editor-marker-editactions {
+	transform: translateY(0px);
+	opacity: 1;
+	pointer-events: unset;
+}
+
+.editor-marker-editactions-title {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
 
 .editor-marker-editactions-selectaction {
 	display: grid;
@@ -52,6 +79,18 @@
 	gap: 5px;
 	padding: 5px;
 	box-sizing: border-box;
+	align-content: flex-start;
+	
+	transition: opacity 0.2s ease-in-out;
+	opacity: 0;
+	pointer-events: none;
+	
+	overflow-y: auto;
+	grid-area: editor-marker-editactions-body;
+}
+.editor-marker-show-editactions-selectaction .editor-marker-editactions-selectaction {
+	opacity: 1;
+	pointer-events: unset;
 }
 .editor-marker-editactions-selectaction-action {
 	color: var(--editor-color-border);
@@ -65,4 +104,15 @@
 }
 .editor-marker-editactions-selectaction-action i {
 	font-size: 2em;
+}
+
+.editor-marker-editactions .marker-action-list {
+	overflow-y: auto;
+	grid-area: editor-marker-editactions-body;
+	transition: opacity 0.2s ease-in-out;
+	opacity: 1;
+}
+.editor-marker-show-editactions-selectaction .marker-action-list {
+	opacity: 0;
+	pointer-events: none;
 }

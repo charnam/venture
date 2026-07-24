@@ -1,0 +1,32 @@
+.marker-action-input {
+	display: inline-flex;
+	background: var(--editor-color-background-inactive);
+	border-radius: 4px;
+	margin: 4px 10px;
+	width: 125px;
+	height: 1.5em;
+	font-size: 0.8em;
+	align-self: center;
+	vertical-align: middle;
+	justify-content: center;
+}
+
+.marker-action-input > :first-child {
+	max-width: 100%;
+}
+.marker-action-input > input {
+	text-align: center;
+	padding: 0 10px;
+	box-sizing: border-box;
+}
+.marker-action-input > button {
+	cursor: pointer;
+	width: 100%;
+	border-radius: inherit;
+}
+.marker-action-input > button:hover {
+	background: #fff6;
+}
+.marker-action-input > button:active {
+	background: #fff2;
+}

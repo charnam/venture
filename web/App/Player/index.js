@@ -2,6 +2,8 @@ import { HTML } from "imperative-html";
 import SingleInstanceRenderable from "../../lib/SingleInstanceRenderable/index.js";
 import App from "../index.js";
 import PlayerData from "./PlayerData/index.js";
+import PlayerState from "./PlayerState/index.js";
+import Editor from "../Editor/index.js";
 
 class Player extends SingleInstanceRenderable {
 	setPath(path) {
@@ -15,12 +17,12 @@ class Player extends SingleInstanceRenderable {
 	// data: video data, markers, etc
 	// state: logic / variable storage during playback, not saved (a save feature may be added later)
 	data = new PlayerData();
-	state = {};
+	state = new PlayerState();
 	
 	errorText = "Loading video...";
 	
 	playback = new HTML.video();
-	canvas = new HTML.canvas({class: "player-canvas"});
+	canvas = new HTML.canvas({class: "player-canvas", tabindex: "0"});
 	ctx = this.canvas.getContext("2d");
 	
 	get currentVideo() {
@@ -99,11 +101,15 @@ class Player extends SingleInstanceRenderable {
 					this.playback.pause();
 				}
 			}
+			setTimeout(() => {
+				this.canvas.focus();
+			}, 100);
 		}
 		
 		this.update();
 		return target;
 	}
+	
 	async updateRendered(target) {
 		await super.updateRendered(target);
 		
@@ -127,42 +133,6 @@ class Player extends SingleInstanceRenderable {
 		} else {
 			setTimeout(() => this.update(), 1000);
 		}
-	}
-	
-	async fetchById(id) {
-		return await this.fetchByURL("/api/v1/data/" + id);
-	}
-	async fetchByURL(url) {
-		this.data = {};
-		try {
-			const dataOrError = await fetch(url).then(res => res.json());
-			
-			if(dataOrError && dataOrError.video) {
-				this.data = dataOrError;
-			} else {
-				switch(dataOrError.error) {
-					case "nonexistent":
-						this.errorText = "This Venture does not exist. Check the link?";
-						break;
-					case "hidden":
-						this.errorText = "This Venture is hidden or private. :(";
-						break;
-					case "moderated":
-						this.errorText = "An admin has removed this Venture. :(";
-						break;
-					case "unknown":
-					case undefined:
-						this.errorText = "Sorry, an internal error occurred. :(";
-						break;
-					default:
-						this.errorText = "Internal error, sorry! Code: " + dataOrError.error;
-						break;
-				}
-			}
-		} catch(err) {
-			this.errorText = "Please reload? Internal error :(";
-		}
-		this.update();
 	}
 	
 	lastFrameVideoTime = 0; // video.currentTime ; set after animate()
@@ -194,16 +164,94 @@ class Player extends SingleInstanceRenderable {
 			this.ctx.fillStyle = "#fff";
 			this.ctx.textAlign = "left";
 			this.ctx.textBaseline = "top";
+			
+			if(this.app instanceof Editor) {
+				if(this.showBounds) {
+					const startCoords = this.coordToCanvas({x: this.showBounds.x, y: this.showBounds.y});
+					const sizeCoords = this.coordToCanvas({x: this.showBounds.width, y: this.showBounds.height}, true);
+					
+					this.ctx.strokeStyle = "#000";
+					this.ctx.lineWidth = 2;
+					this.ctx.strokeRect(
+						startCoords.x,
+						startCoords.y,
+						sizeCoords.x,
+						sizeCoords.y
+					);
+					this.ctx.strokeStyle = "#fff";
+					this.ctx.strokeWidth = 1;
+					this.ctx.strokeRect(
+						startCoords.x,
+						startCoords.y,
+						sizeCoords.x,
+						sizeCoords.y
+					);
+				}
+				
+			}
 		}
 	}
 	
-	coordToCanvas(xy) {
+	// Disable other editor UI in editor
+	// Just uses CSS. Not special.
+	setFocusMode(bool) {
+		if(bool) {
+			this.canvas.classList.add("focus-mode");
+		} else {
+			this.canvas.classList.remove("focus-mode");
+		}
+	}
+	async editorGetBounds() {
+		this.setFocusMode(true);
+		let bounds = {x: 0, y: 0, width: 0, height: 0};
+		
+		await new Promise(res => {
+			const mouseDownListener = event => {
+				this.canvas.removeEventListener("mousedown", mouseDownListener);
+				
+				const startPos = this.mouseEventToCoordPosition(event);
+				
+				const mouseMoveListener = event => {
+					const currentPos = this.mouseEventToCoordPosition(event);
+					
+					bounds.x      = Math.min(startPos.x, currentPos.x);
+					bounds.y      = Math.min(startPos.y, currentPos.y);
+					bounds.width  = Math.max(startPos.x, currentPos.x) - bounds.x;
+					bounds.height = Math.max(startPos.y, currentPos.y) - bounds.y;
+					
+					this.showBounds = bounds;
+				}
+				
+				// call "mouse move" when mouse is initially clicked, just
+				// to populate variables
+				mouseMoveListener(event);
+				
+				const mouseUpListener = () => {
+					this.showBounds = null;
+					
+					res();
+					
+					window.removeEventListener("mousemove", mouseMoveListener);
+					window.removeEventListener("mouseup", mouseUpListener);
+				}
+				window.addEventListener("mousemove", mouseMoveListener);
+				window.addEventListener("mouseup", mouseUpListener);
+			};
+			
+			this.canvas.addEventListener("mousedown", mouseDownListener)
+		});
+		
+		this.setFocusMode(false);
+		return bounds;
+	}
+	
+	coordToCanvas(xy, scaleOnly) {
 		if(!xy.x) xy.x = 0;
 		if(!xy.y) xy.y = 0;
 		
 		return {
-			x: this.canvas.width / 2 + (xy.x * this._coordScaleFactor()),
-			y: this.canvas.height / 2 + (xy.y * this._coordScaleFactor()),
+			x: (!scaleOnly * this.canvas.width / 2) + (xy.x * this._coordScaleFactor()),
+			y: (!scaleOnly * this.canvas.height / 2) + (xy.y * this._coordScaleFactor()),
 		};
 	}
 	canvasToCoord(xy) {
@@ -262,6 +310,42 @@ class Player extends SingleInstanceRenderable {
 	}
 	mouseEventToCoordPosition(event) {
 		return this.canvasToCoord(this.mouseEventToCanvasPosition(event));
+	}
+	
+	async fetchById(id) {
+		return await this.fetchByURL("/api/v1/data/" + id);
+	}
+	async fetchByURL(url) {
+		this.data = {};
+		try {
+			const dataOrError = await fetch(url).then(res => res.json());
+			
+			if(dataOrError && dataOrError.video) {
+				this.data = dataOrError;
+			} else {
+				switch(dataOrError.error) {
+					case "nonexistent":
+						this.errorText = "This Venture does not exist. Check the link?";
+						break;
+					case "hidden":
+						this.errorText = "This Venture is hidden or private. :(";
+						break;
+					case "moderated":
+						this.errorText = "An admin has removed this Venture. :(";
+						break;
+					case "unknown":
+					case undefined:
+						this.errorText = "Sorry, an internal error occurred. :(";
+						break;
+					default:
+						this.errorText = "Internal error, sorry! Code: " + dataOrError.error;
+						break;
+				}
+			}
+		} catch(err) {
+			this.errorText = "Please reload? Internal error :(";
+		}
+		this.update();
 	}
 	
 }

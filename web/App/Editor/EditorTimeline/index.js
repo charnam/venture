@@ -226,7 +226,7 @@ class EditorTimeline extends SingleInstanceRenderable {
 			]);
 			
 			let keep = [];
-			for(let i = 0; i < this.editor.player.playback.duration; i+=secondIncrement) {
+			for(let i = Math.floor(scroller.scrollLeft / pxPerSecond / secondIncrement) * secondIncrement; i < Math.min((scroller.scrollLeft + window.innerWidth) / pxPerSecond, this.editor.player.playback.duration); i+=secondIncrement) {
 				const markerGuideLineX = i * pxPerSecond;
 				const existingLine = document.querySelector(".editor-timeline-scroller-background-line[lineid=\"" + i + "\"]");
 				const existingDigit = document.querySelector(".editor-timeline-scroller-playbar-digit[lineid=\"" + i + "\"]");
@@ -253,7 +253,7 @@ class EditorTimeline extends SingleInstanceRenderable {
 							class: "editor-timeline-scroller-playbar-digit",
 							lineid: i,
 							style: "--x-sec: " + i + ";"
-						}, parseFloat(i.toFixed(2)));
+						}, Timing.timestamp(i.toFixed(2)));
 						
 						target.querySelector(".editor-timeline-scroller-playbar-digits").append(digit);
 						keep.push(digit);
@@ -263,7 +263,7 @@ class EditorTimeline extends SingleInstanceRenderable {
 			
 			{
 				const playhead = target.querySelector(".editor-timeline-scroller-playbar-playhead");
-				playhead.innerText = Timing.timestamp(this.editor.player.playback.currentTime);
+				playhead.innerText = Timing.timestamp(this.editor.player.playback.currentTime, true);
 				
 				const pxPerSecond = this.getPxPerSecond();
 				
@@ -280,7 +280,8 @@ class EditorTimeline extends SingleInstanceRenderable {
 					markersEl.append(
 						markerEl = new HTML.div({
 							class: "editor-timeline-scroller-marker",
-							markerid: id
+							markerid: id,
+							tabindex: 0
 						})
 					)
 					
@@ -325,7 +326,6 @@ class EditorTimeline extends SingleInstanceRenderable {
 							if(isMovingMarker) {
 								for(let item of this.editor.selection.filter(item => item.type == "marker")) {
 									if(item.video == this.editor.player.currentVideo) {
-										console.log(item.id, this.editor.player.currentVideoData)
 										this.editor.player.currentVideoData.markers[item.id].timestamp += (fullMouseX - lastFullMouseX) * this.editor.player.playback.duration;
 									}
 								}
@@ -377,10 +377,10 @@ class EditorTimeline extends SingleInstanceRenderable {
 	}
 	
 	getPxPerSecond() {
-		return 100 * this.zoomLevel;
+		return 150 * this.zoomLevel;
 	}
 	getMinZoom(target) {
-		const minZoom = target.querySelector(".editor-timeline-scroller").clientWidth / this.editor.player.playback.duration / 100;
+		const minZoom = target.querySelector(".editor-timeline-scroller").clientWidth / this.editor.player.playback.duration / (this.getPxPerSecond() / this.zoomLevel);
 		return (isNaN(minZoom) || !minZoom) ? 0.01 : minZoom;
 	}
 	getMaxZoom(target) {

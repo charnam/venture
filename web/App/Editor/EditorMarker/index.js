@@ -2,14 +2,18 @@ import { HTML } from "imperative-html";
 import SingleInstanceRenderable from "../../../lib/SingleInstanceRenderable/index.js";
 import Random from "../../../lib/Random.js";
 import PlayerData from "../../Player/PlayerData/index.js";
+import MarkerAction from "./MarkerAction/index.js";
+import MarkerActionList from "./MarkerActionList/index.js";
 
 class EditorMarker extends SingleInstanceRenderable {
 	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "editor-marker"]
 	
+	actionList = new MarkerActionList();
 	constructor(editor) {
 		super();
 		this.editor = editor;
+		this.actionList.editor = this.editor;
 	}
 	
 	render() {
@@ -23,8 +27,9 @@ class EditorMarker extends SingleInstanceRenderable {
 			),
 			new HTML.div({class: "editor-marker-showcount"}, "0 markers selected"),
 			new HTML.div({class: "editor-marker-editactions"},
+				new HTML.h2({class: "editor-marker-editactions-title"}, "This marker should..."),
 				new HTML.div({class: "editor-marker-editactions-selectaction"}),
-				new HTML.div({class: "editor-marker-editactions-actionlist"}),
+				this.actionList.render(),
 			)
 		);
 		
@@ -69,6 +74,8 @@ class EditorMarker extends SingleInstanceRenderable {
 			
 			if(marker.actions.length == 0) {
 				target.classList.add("editor-marker-show-editactions-selectaction")
+			} else if(this.lastFrameSelection !== selection[0]) {
+				target.classList.remove("editor-marker-show-editactions-selectaction")
 			}
 		} else {
 			target.classList.remove("editor-marker-show-editactions");
@@ -104,8 +111,11 @@ class EditorMarker extends SingleInstanceRenderable {
 				
 				existing.onclick = () => {
 					selectedMarker.actions.push({
-						type: possibleAction.type
-					})
+						type: possibleAction.type,
+						...possibleAction.defaults
+					});
+					target.classList.remove("editor-marker-show-editactions-selectaction");
+					this.update();
 				}
 				
 				if(possibleAction.canBeAdded == undefined || possibleAction.canBeAdded === true) {
@@ -121,13 +131,8 @@ class EditorMarker extends SingleInstanceRenderable {
 				}
 			}
 			
-			const actionList = target.querySelector(".editor-marker-editactions-actionlist");
-			actionList.innerHTML = "";
-			for(let action of selectedMarker.actions) {
-				actionList.append(
-					new HTML.div(JSON.stringify(action))
-				)
-			}
+			this.actionList.markerActions = selectedMarker.actions
+			this.actionList.update();
 		}
 	}
 	

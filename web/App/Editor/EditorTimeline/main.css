@@ -64,6 +64,7 @@
 	top: 0;
 	left: calc(var(--playback-time) * var(--px-per-second));
 	height: 100%;
+	pointer-events: none;
 }
 .editor-timeline-scroller-playhead {
 	width: 1px;
@@ -78,6 +79,7 @@
 	display: flex;
 	align-items: flex-end;
 	text-shadow: 0 1px 0px black;
+	font-family: "Courier Prime", monospace;
 }
 .editor-timeline-scroller-marker {
 	position: absolute;

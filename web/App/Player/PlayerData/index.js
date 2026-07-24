@@ -1,5 +1,6 @@
 import * as zip from "@zip.js/zip.js";
 import { HTML } from "imperative-html";
+import PlayerElement from "../PlayerState/PlayerElement/index.js";
 
 class PlayerData {
 	static actions = [
@@ -9,9 +10,27 @@ class PlayerData {
 			name: "Create element",
 			icon: "bi bi-plus-square-dotted",
 			
+			editor: [
+				[{label: "Define an element"}],
+				[{label: "named "}, {attribute: "id"}],
+				[{label: "at "}, {attribute: "bounds"}]
+			],
+			
 			attributes: {
 				id: {type: "new_element_id"},
-				data: {type: "element_data"}
+				bounds: {type: "element_bounds"}
+			},
+			
+			defaults: {
+				id: "element1",
+				bounds: {x: -0.1, y: -0.1, width: 0.2, height: 0.2}
+			},
+			
+			execute: (state, attributes) => {
+				let element = state.elements[attributes.id] = new PlayerElement(state);
+				
+				
+				
 			},
 			
 			canBeAdded: (file, video, marker) => {
@@ -28,6 +47,10 @@ class PlayerData {
 			
 			name: "Remove element",
 			icon: "bi bi-dash-square-dotted",
+			
+			editor: [
+				[{label: "Remove element "}, {attribute: "id"}]
+			],
 			
 			attributes: {
 				id: {type: "existing_element_id"}
@@ -68,9 +91,14 @@ class PlayerData {
 			icon: "bi bi-fast-forward-fill",
 			
 			attributes: {
-				video: {type: "video"},
-				time: {type: "float", min: 0, max: 60*60*60}
+				video: {type: "video", allowCurrent: true},
+				time: {type: "float", min: 0, max: 60*60*60, value: 0}
 			}
+		},
+		{
+			type: "add_event",
+			
+			name: "Element event"
 		},
 		{
 			type: "pause_until",
@@ -135,9 +163,9 @@ class PlayerData {
 		this.version = json.version;
 		
 		// I love input validation :)
-		if(!Array.isArray(this.videos))
+		if(!Array.isArray(this.videos)) {
 			this.videos = [];
-		
+		}
 		for(let video of this.videos) {
 			for(let marker of Object.values(video.markers)) {
 				if(!Array.isArray(marker.actions))

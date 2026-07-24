@@ -1,14 +1,22 @@
 
 class Timing {
-	static timestamp(secs) {
-		var sec_num = parseInt(secs, 10)
+	static timestamp(secs, padMillis) {
+		var sec_num = parseFloat(secs)
 		var hours = Math.floor(sec_num / 3600)
 		var minutes = Math.floor(sec_num / 60) % 60
-		var seconds = sec_num % 60
-
+		var seconds = parseFloat((sec_num % 60).toFixed(3))
+		
 		return [hours, minutes, seconds]
-			.map(v => v < 10 ? "0" + v : v)
-			.filter((v, i) => v !== "00" || i > 0)
+			.map((v, i) => (v < 10 && i > 0) ? "0" + v : v.toString())
+			.map((v, i) => {
+				if(i == 2 && padMillis) {
+					let number = (Math.round(v * 1000) / 1000);
+					return v.split(".")[0] + "." + String(Math.round((number % 1) * 1000)).padStart(3, "0")
+				} else {
+					return v;
+				}
+			})
+			.filter((v, i) => v !== "00" && v != "0" || i > 0)
 			.join(":")
 	}
 	
