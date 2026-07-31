@@ -2,7 +2,7 @@
 	display: inline-flex;
 	background: var(--editor-color-background-inactive);
 	border-radius: 4px;
-	margin: 4px 10px;
+	margin: 4px 0;
 	width: 125px;
 	height: 1.5em;
 	font-size: 0.8em;
@@ -14,7 +14,8 @@
 .marker-action-input > :first-child {
 	max-width: 100%;
 }
-.marker-action-input > input {
+.marker-action-input > input,
+.marker-action-input > select {
 	text-align: center;
 	padding: 0 10px;
 	box-sizing: border-box;

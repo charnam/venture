@@ -29,7 +29,7 @@ body {
 	height: min(100vh, calc(100vh * 9 / 16));
 }
 
-button, input {
+button, input, select {
 	background: transparent;
 	border: none;
 	font-size: inherit;

@@ -3,7 +3,29 @@
 	margin: 8px;
 	background: var(--editor-color-background-active);
 	border-radius: 8px;
+	
+	display: grid;
+	grid-template-areas: "inputs buttons";
+	grid-template-columns: 1fr min-content;
+	
+	max-width: 400px;
+	width: 100%;
+	box-sizing: border-box;
 }
 .marker-action-inputline {
 	white-space: pre;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 5px;
+}
+.marker-action-buttons {
+	display: flex;
+	flex-direction: column;
+	color: var(--editor-color-border);
+}
+.marker-action-button {
+	cursor: pointer;
+}
+.marker-action-button:hover {
+	color: white;
 }

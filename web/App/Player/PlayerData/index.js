@@ -1,6 +1,7 @@
 import * as zip from "@zip.js/zip.js";
 import { HTML } from "imperative-html";
-import PlayerElement from "../PlayerState/PlayerElement/index.js";
+import PlayerElement from "../VideoState/PlayerElement/index.js";
+import VideoState from "../VideoState/index.js";
 
 class PlayerData {
 	static actions = [
@@ -22,67 +23,76 @@ class PlayerData {
 			},
 			
 			defaults: {
-				id: "element1",
+				id: null,
 				bounds: {x: -0.1, y: -0.1, width: 0.2, height: 0.2}
 			},
 			
 			execute: (state, attributes) => {
-				let element = state.elements[attributes.id] = new PlayerElement(state);
-				
-				
-				
-			},
-			
-			canBeAdded: (file, video, marker) => {
-				if(file.getPossibleElementsAt(marker.video, marker.timestamp).length > 7) {
-					return false;
+				if(!state.elements[attributes.id]) {
+					let element = state.elements[attributes.id] = new PlayerElement(state);
+					element.setBounds(attributes.bounds, state.timestamp);
 				}
-				
-				return true;
-			},
-			canBeNested: false
+			}
 		},
 		{
-			type: "element_remove",
+			type: "element_visibility",
 			
-			name: "Remove element",
+			name: "Hide/show element",
 			icon: "bi bi-dash-square-dotted",
 			
 			editor: [
-				[{label: "Remove element "}, {attribute: "id"}]
+				[{attribute: "visible"}, {label: " element"}],
+				[{label: "named "}, {attribute: "id"}]
 			],
 			
 			attributes: {
-				id: {type: "existing_element_id"}
+				id: {type: "existing_element_id"},
+				visible: {type: "dropdown", values: [
+					{label: "Show", value: true},
+					{label: "Hide", value: false}
+				]}
 			},
 			
-			canBeAdded: (file, video, marker) => {
-				if(file.getPossibleElementsAt(video, marker.timestamp).length > 0) {
-					return true;
-				}
-				
-				return false;
+			defaults: {
+				id: "",
+				visible: false
 			},
-			canBeNested: false
+			
+			execute: (state, attributes) => {
+				const element = state.elements[attributes.id];
+				if(element) {
+					element.setExists(attributes.value, state.timestamp);
+				}
+			}
 		},
 		{
 			type: "element_animate",
 			
-			name: "Animate element",
+			name: "Adjust element",
 			icon: "bi bi-bezier2",
 			
 			attributes: {
-				id: {type: "existing_element_id"}
+				id: {type: "existing_element_id"},
+				bounds: {type: "element_bounds"}
 			},
 			
-			canBeAdded: (file, video, marker) => {
-				if(file.getPossibleElementsAt(video, marker.timestamp).length > 0) {
-					return true;
-				}
-				
-				return false;
+			editor: [
+				[{label: "Move element"}],
+				[{label: "named "}, {attribute: "id"}],
+				[{label: "to "}, {attribute: "bounds"}]
+			],
+			
+			defaults: {
+				id: "",
+				bounds: {x: 0, y: 0, width: 0, height: 0}
 			},
-			canBeNested: false
+			
+			execute: (state, attributes) => {
+				const element = state.elements[attributes.id]
+				if(element) {
+					element.setBounds(attributes.bounds, state.timestamp);
+				}
+			}
 		},
 		{
 			type: "skip",
@@ -91,14 +101,46 @@ class PlayerData {
 			icon: "bi bi-fast-forward-fill",
 			
 			attributes: {
-				video: {type: "video", allowCurrent: true},
-				time: {type: "float", min: 0, max: 60*60*60, value: 0}
+				marker: {type: "marker", anyVideo: true}
+			},
+			
+			editor: [
+				[{label: "Skip to marker: "}, {attribute: "marker"}]
+			],
+			
+			defaults: {
+			},
+			
+			execute: (state, attributes, settings = {}) => {
+				if(!settings?.isPreLoading) {
+					const id = attributes.marker?.id;
+					const videoId = attributes.marker?.video;
+					if(state.videoId == videoId) {
+						const marker = state.video.markers[id];
+						if(marker) {
+							state.timestamp = marker.timestamp;
+						}
+					} else {
+						// TODO: switch to other video
+						//state.player.
+					}
+				}
 			}
 		},
 		{
-			type: "add_event",
+			type: "element_event",
 			
-			name: "Element event"
+			name: "Set element actions",
+			icon: "bi bi-mouse",
+			
+			attributes: {
+				id: {type: "existing_element_id"},
+				actions: {type: "actions"}
+			},
+			
+			execute: (state, attributes) => {
+				
+			}
 		},
 		{
 			type: "pause_until",
@@ -119,21 +161,61 @@ class PlayerData {
 		}
 	};
 	
+	static validateActions(actions) {
+		if(!Array.isArray(actions)) return false;
+		
+		for(let action of actions) {
+			const actionParams = this.actions.find(test => test.type == action.type);
+			if(!actionParams) {
+				return false;
+			}
+			
+			for(let [param_id, param_details] of Object.entries(actionParams.attributes)) {
+				const usedParam = action[param_id];
+				switch(param_details.type) {
+					case "new_element_id":
+						if(typeof usedParam !== "string") return false;
+						break;
+					case "existing_element_id":
+						if(typeof usedParam !== "string") return false;
+						break;
+					case "dropdown":
+						if(!Array.isArray(usedParam?.values)) return false;
+						
+						for(let value of usedParam.values) {
+							if(!value?.label || value?.value == undefined)
+								return false;
+						}
+						
+						break;
+					case "element_bounds":
+						if(!usedParam) return false;
+						
+						if(
+							typeof usedParam.x !== "number" ||
+							typeof usedParam.y !== "number" ||
+							typeof usedParam.width !== "number" ||
+							typeof usedParam.height !== "number"
+						) {
+							return false;
+						}
+						break;
+					
+					// unknown action type
+					default:
+						return false;
+				}
+			}
+		}
+		
+		return true;
+	}
+	
 	version = 1;
 	
 	id = "local";
 	title = "My Venture";
 	videos = [];
-	
-	getPossibleElementsAt(video, timestamp) {
-		let elements = [];
-		if(this.videos[video]) {
-			for(let marker of Object.values(this.videos[video].markers).sort((a, b) => a.timestamp - b.timestamp)) {
-				
-			}
-		}
-		return elements;
-	}
 	
 	constructor(json = {}) {
 		try {

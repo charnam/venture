@@ -10,10 +10,11 @@ class EditorMarker extends SingleInstanceRenderable {
 	classes = [...this.classes, "editor-marker"]
 	
 	actionList = new MarkerActionList();
-	constructor(editor) {
+	constructor(editor, marker) {
 		super();
 		this.editor = editor;
 		this.actionList.editor = this.editor;
+		this.actionList.marker = this.marker;
 	}
 	
 	render() {
@@ -131,7 +132,8 @@ class EditorMarker extends SingleInstanceRenderable {
 				}
 			}
 			
-			this.actionList.markerActions = selectedMarker.actions
+			this.actionList.marker = selectedMarker
+			this.actionList.actions = selectedMarker.actions
 			this.actionList.update();
 		}
 	}

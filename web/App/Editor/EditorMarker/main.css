@@ -93,12 +93,20 @@
 	pointer-events: unset;
 }
 .editor-marker-editactions-selectaction-action {
+	background: var(--editor-color-background-inactive);
 	color: var(--editor-color-border);
-	background: var(--editor-color-background-active);
+	border: 1px solid var(--editor-color-background-active);
 	display: flex;
 	flex-direction: column;
+	justify-content: space-evenly;
 	border-radius: 10px;
+	cursor: pointer;
+	padding: 8px 16px;
 }
+.editor-marker-editactions-selectaction-action:hover {
+	background: var(--editor-color-background-active);
+}
+
 .editor-marker-editactions-selectaction-action[disabled] {
 	opacity: 0.5;
 }
@@ -111,6 +119,11 @@
 	grid-area: editor-marker-editactions-body;
 	transition: opacity 0.2s ease-in-out;
 	opacity: 1;
+	
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	overflow-x: hidden;
 }
 .editor-marker-show-editactions-selectaction .marker-action-list {
 	opacity: 0;

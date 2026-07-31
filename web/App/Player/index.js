@@ -2,8 +2,8 @@ import { HTML } from "imperative-html";
 import SingleInstanceRenderable from "../../lib/SingleInstanceRenderable/index.js";
 import App from "../index.js";
 import PlayerData from "./PlayerData/index.js";
-import PlayerState from "./PlayerState/index.js";
 import Editor from "../Editor/index.js";
+import VideoState from "./VideoState/index.js";
 
 class Player extends SingleInstanceRenderable {
 	setPath(path) {
@@ -16,8 +16,9 @@ class Player extends SingleInstanceRenderable {
 	
 	// data: video data, markers, etc
 	// state: logic / variable storage during playback, not saved (a save feature may be added later)
+	//        key: video id, value: VideoState
 	data = new PlayerData();
-	state = new PlayerState();
+	state = {};
 	
 	errorText = "Loading video...";
 	
@@ -158,6 +159,7 @@ class Player extends SingleInstanceRenderable {
 			this.ctx.textBaseline = "middle";
 			this.ctx.fillText(this.errorText, this.canvas.width / 2, this.canvas.height / 2);
 		} else {
+			this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
 			this.ctx.drawImage(this.playback, 0, 0, this.canvas.width, this.canvas.height);
 			
 			this.ctx.font = this.canvas.height / 12 + "px sans-serif";
@@ -188,6 +190,29 @@ class Player extends SingleInstanceRenderable {
 					);
 				}
 				
+				if(!this.app.preview) {
+					const state = VideoState.findDefaultStateAtTimestamp(this, this.currentVideo, this.playback.currentTime);
+					for(let [elementid, element] of Object.entries(state.elements)) {
+						const exists = element.getExists(this.playback.currentTime);
+						if(exists === false) {
+							continue;
+						}
+						
+						const bounds = element.getBounds(this.playback.currentTime);
+						
+						const startCoords = this.coordToCanvas({x: bounds.x, y: bounds.y});
+						const sizeCoords = this.coordToCanvas({x: bounds.width, y: bounds.height}, true);
+						
+						this.ctx.strokeStyle = "#fff";
+						this.ctx.strokeWidth = 1;
+						this.ctx.strokeRect(
+							startCoords.x,
+							startCoords.y,
+							sizeCoords.x,
+							sizeCoords.y
+						)
+					}
+				}
 			}
 		}
 	}

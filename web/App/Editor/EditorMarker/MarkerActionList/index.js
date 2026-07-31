@@ -5,10 +5,11 @@ class MarkerActionList extends SingleInstanceRenderable {
 	style = this.autoStyleByImport(import.meta.url);
 	classes = [...this.classes, "marker-action-list"]
 	
-	constructor(editor, markerActions) {
+	constructor(editor, marker, actions) {
 		super();
 		this.editor = editor;
-		this.markerActions = markerActions;
+		this.marker = marker;
+		this.actions = actions;
 	}
 	
 	render() {
@@ -20,13 +21,13 @@ class MarkerActionList extends SingleInstanceRenderable {
 	async updateRendered(target) {
 		await super.updateRendered(target);
 		
-		for(let index in this.markerActions) {
-			const action = this.markerActions[index];
+		for(let index in this.actions) {
+			const action = this.actions[index];
 			const child = target.children[index];
 			if(child?.renderable?.action == action) {
 				child.renderable.update();
 			} else {
-				const markerAction = new MarkerAction(this.editor, action);
+				const markerAction = new MarkerAction(this.editor, this.marker, action, this.actions);
 				if(child) {
 					child.replaceWith(markerAction.render());
 				} else {

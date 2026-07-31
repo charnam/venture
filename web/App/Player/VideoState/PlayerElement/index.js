@@ -23,7 +23,7 @@ class PlayerElement {
 		);
 	}
 	getBounds(timestamp) {
-		let keyframes = this.keyframes.filter(keyframe => keyframe.timestamp < timestamp && keyframe.type == "bounds");
+		let keyframes = this.keyframes.filter(keyframe => keyframe.timestamp <= timestamp && keyframe.type == "bounds");
 		return keyframes[keyframes.length - 1]?.bounds ?? {x: 0, y: 0, width: 1, height: 1}; // TODO: set width & height to 0 after testing is done
 	}
 	
